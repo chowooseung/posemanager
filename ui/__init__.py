@@ -449,6 +449,14 @@ class PoseManagerUI(MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
         save_action.triggered.connect(self.save)
         load_action.triggered.connect(self.load)
 
+        utils_menu = menu.addMenu("Utils")
+        refresh_action = QtWidgets.QAction(QtGui.QIcon(":refresh.png"), "Refresh", self)
+        auto_gaussian_action = QtWidgets.QAction(QtGui.QIcon(":falloff_generic.png"), "Auto Gaussian", self)
+        utils_menu.addAction(refresh_action)
+        utils_menu.addAction(auto_gaussian_action)
+        refresh_action.triggered.connect(self.refresh_ui)
+        auto_gaussian_action.triggered.connect(pm_api.auto_adjust_gaussian_falloff)
+
         return widget
 
     def save(self):
@@ -479,6 +487,8 @@ class PoseManagerUI(MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
         else:
             return None
         pm_io.load(file_path=file_path)
+        self.refresh_ui()
+
+    def refresh_ui(self):
         self.driver_widget.refresh_ui()
         self.pose_driven_widget.refresh_ui()
-

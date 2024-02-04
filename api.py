@@ -549,6 +549,8 @@ def go_to_pose(driver, pose):
 
 
 def auto_adjust_gaussian_falloff():
+    if not mc.objExists("pose_manager"):
+        return
     data = get_data()
     for interpolator in data.keys():
         for pose in data[interpolator]["pose"].keys():

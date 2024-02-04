@@ -32,7 +32,7 @@ def load(file_path):
     try:
         for interpolator_name in data.keys():
             # add driver
-            driver = interpolator_name.replace("_poseInterpolator", "")
+            driver = interpolator_name.replace("_pmInterpolator", "")
             controller = data[interpolator_name]["controller"]
             api.add_driver(driver, controller)
 

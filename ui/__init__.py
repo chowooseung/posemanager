@@ -14,25 +14,25 @@ from maya import cmds as mc
 
 class DriverWidget(QtWidgets.QWidget):
     """
-    ┌──────────────────────────────┐
-    │  ┌─list widget────────────┐  │
-    │  │                        │  │
-    │  │                        │  │
-    │  │ * driver1 | controller │  │
-    │  │ driver2 | controller   │  │
-    │  │                        │  │
-    │  │                        │  │
-    │  │                        │  │
-    │  │                        │  │
-    │  │                        │  │
-    │  │                        │  │
-    │  │                        │  │
-    │  └────────────────────────┘  │
-    │  ┌──────┐ ┌──────┐ ┌──────┐  │
-    │  │add   │ │mirror│ │delete│  │
-    │  │driver│ │driver│ │driver│  │
-    │  └──────┘ └──────┘ └──────┘  │
-    └──────────────────────────────┘
+┌──────────────────────────────┐
+│  ┌─list widget────────────┐  │
+│  │                        │  │
+│  │                        │  │
+│  │ * driver1 | controller │  │
+│  │ driver2 | controller   │  │
+│  │                        │  │
+│  │                        │  │
+│  │                        │  │
+│  │                        │  │
+│  │                        │  │
+│  │                        │  │
+│  │                        │  │
+│  └────────────────────────┘  │
+│  ┌──────┐ ┌──────┐ ┌──────┐  │
+│  │add   │ │mirror│ │delete│  │
+│  │driver│ │driver│ │driver│  │
+│  └──────┘ └──────┘ └──────┘  │
+└──────────────────────────────┘
 
     driver list widget - item double click - current driver change
 
@@ -54,7 +54,7 @@ class DriverWidget(QtWidgets.QWidget):
         self.setLayout(layout)
 
         self.list_widget = QtWidgets.QListWidget(self)
-        self.list_widget.setSelectionMode(QtWidgets.QListWidget.SingleSelection)
+        self.list_widget.setSelectionMode(QtWidgets.QListWidget.ExtendedSelection)
         self.list_widget.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
         self.list_widget.itemDoubleClicked.connect(self.change_driver)
         layout.addWidget(self.list_widget)
@@ -98,15 +98,19 @@ class DriverWidget(QtWidgets.QWidget):
         self.refresh_ui()
 
     def mirror_driver(self):
-        item = self.list_widget.currentItem()
-        pm_api.mirror_driver(item.text().split(" | ")[0])
-        self.refresh_ui()
+        items = self.list_widget.selectedItems()
+        for item in items:
+            pm_api.mirror_driver(item.text().split(" | ")[0])
+        if items:
+            self.refresh_ui()
 
     def delete_driver(self):
-        item = self.list_widget.currentItem()
-        pm_api.delete_driver(item.text().split(" | ")[0])
-        self.refresh_ui()
-        self.changedCurrentDriver.emit("")
+        items = self.list_widget.selectedItems()
+        for item in items:
+            pm_api.delete_driver(item.text().split(" | ")[0])
+        if items:
+            self.refresh_ui()
+            self.changedCurrentDriver.emit("")
 
     def change_driver(self, item):
         self.changedCurrentDriver.emit(item.text().split(" | ")[0])
@@ -114,38 +118,38 @@ class DriverWidget(QtWidgets.QWidget):
 
 class PoseDrivenWidget(QtWidgets.QWidget):
     """
-      ┌────┐
-    ┌─┤pose│| driven1 | driven2 | ... | ◄ ► ─┐
-    │ └────┘                                 │
-    │                  ┌───────────────────┐ │
-    │  Current Driver :│                   │ │
-    │                  └───────────────────┘ │
-    │                                        │
-    │ ┌──────┬────┬────┬────┬────┬────┬────┐ │
-    │ │ pose │ tx │ ty │ tz │ rx │ ry │ rz │ │
-    │ │ name │    │    │    │    │    │    │ │
-    │ ├──────┼────┼────┼────┼────┼────┼────┤ │
-    │ │ pose │ 0  │ 0  │ 0  │ 0  │ 0  │ 0  │ │
-    │ │  #1  │    │    │    │    │    │    │ │
-    │ ├──────┼────┼────┼────┼────┼────┼────┤ │
-    │ │ pose │ 0  │ 0  │ 0  │ 90 │ 0  │ 0  │ │
-    │ │  #2  │    │    │    │    │    │    │ │
-    │ ├──────┼────┼────┼────┼────┼────┼────┤ │
-    │ │ pose │ 0  │ 0  │ 0  │ 0  │ 90 │ 0  │ │
-    │ │  #3  │    │    │    │    │    │    │ │
-    │ └──────┴────┴────┴────┴────┴────┴────┘ │
-    │                                        │
-    │ ┌──────────┐ ┌──────────┐ ┌──────────┐ │
-    │ │add       │ │update    │ │delete    │ │
-    │ │pose      │ │pose      │ │pose      │ │
-    │ └──────────┘ └──────────┘ └──────────┘ │
-    │                                        │
-    │ ┌──────────┐ ┌──────────┐ ┌──────────┐ │
-    │ │add       │ │update    │ │delete    │ │
-    │ │driven    │ │driven    │ │driven    │ │
-    │ └──────────┘ └──────────┘ └──────────┘ │
-    │                                        │
-    └────────────────────────────────────────┘
+  ┌────┐
+┌─┤pose│| driven1 | driven2 | ... | ◄ ► ─┐
+│ └────┘                                 │
+│                  ┌───────────────────┐ │
+│  Current Driver :│                   │ │
+│                  └───────────────────┘ │
+│                                        │
+│ ┌──────┬────┬────┬────┬────┬────┬────┐ │
+│ │ pose │ tx │ ty │ tz │ rx │ ry │ rz │ │
+│ │ name │    │    │    │    │    │    │ │
+│ ├──────┼────┼────┼────┼────┼────┼────┤ │
+│ │ pose │ 0  │ 0  │ 0  │ 0  │ 0  │ 0  │ │
+│ │  #1  │    │    │    │    │    │    │ │
+│ ├──────┼────┼────┼────┼────┼────┼────┤ │
+│ │ pose │ 0  │ 0  │ 0  │ 90 │ 0  │ 0  │ │
+│ │  #2  │    │    │    │    │    │    │ │
+│ ├──────┼────┼────┼────┼────┼────┼────┤ │
+│ │ pose │ 0  │ 0  │ 0  │ 0  │ 90 │ 0  │ │
+│ │  #3  │    │    │    │    │    │    │ │
+│ └──────┴────┴────┴────┴────┴────┴────┘ │
+│                                        │
+│ ┌──────────┐ ┌──────────┐ ┌──────────┐ │
+│ │add       │ │update    │ │delete    │ │
+│ │pose      │ │pose      │ │pose      │ │
+│ └──────────┘ └──────────┘ └──────────┘ │
+│                                        │
+│ ┌──────────┐ ┌──────────┐ ┌──────────┐ │
+│ │add       │ │update    │ │delete    │ │
+│ │driven    │ │driven    │ │driven    │ │
+│ └──────────┘ └──────────┘ └──────────┘ │
+│                                        │
+└────────────────────────────────────────┘
     """
 
     current_driver = None
@@ -422,18 +426,18 @@ class PoseManagerUI(MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
         layout = QtWidgets.QVBoxLayout(widget)
         widget.setLayout(layout)
 
-        driver_widget = DriverWidget(widget)
-        layout.addWidget(driver_widget)
+        self.driver_widget = DriverWidget(widget)
+        layout.addWidget(self.driver_widget)
 
         line = QtWidgets.QFrame()
         line.setFrameShape(QtWidgets.QFrame.HLine)
         line.setFrameShadow(QtWidgets.QFrame.Sunken)
         layout.addWidget(line)
 
-        pose_driven_widget = PoseDrivenWidget(widget)
-        layout.addWidget(pose_driven_widget)
+        self.pose_driven_widget = PoseDrivenWidget(widget)
+        layout.addWidget(self.pose_driven_widget)
 
-        driver_widget.changedCurrentDriver.connect(pose_driven_widget.refresh_ui)
+        self.driver_widget.changedCurrentDriver.connect(self.pose_driven_widget.refresh_ui)
 
         menu = self.menuBar()
         file_menu = menu.addMenu("File")
@@ -475,3 +479,6 @@ class PoseManagerUI(MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
         else:
             return None
         pm_io.load(file_path=file_path)
+        self.driver_widget.refresh_ui()
+        self.pose_driven_widget.refresh_ui()
+
